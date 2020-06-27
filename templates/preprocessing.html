@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block title %} Preprocessing {% endblock %}
+
+{% block body %}
+
+<table id="dataTable" class="table table-striped">
+    <thead>
+    <tr>
+        <td>Sebelum Preprocessing</td>
+        <td>Setelah Preprocessing</td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in preprocessing %}
+    <tr>
+        <td>{{ row.1 }}</td>
+        <td>{{ row.2 }}</td>
+        <!--<td>
+            <a href="#!" class="btn btn-info" data-toggle="modal" data-target="#detail{{ row.0 }}"><i class="fa fa-info-circle"></i> detail </a>
+        </td>-->
+    </tr>
+    <!--start modal detail
+        <div class="modal fade bd-example-modal-lg" id="detail{{ row.0 }}">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detail Preprocessing</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                            <h5>Hasil Teks Preprocessing</h5><br>
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                                <h5>Filtering</h5><br>
+                                <label>{{ row.2 }}</label>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                                <h5>Stopword</h5><br>
+                                <label>{{ row.3 }}</label>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                                <h5>Stemming</h5><br>
+                                <label>{{ row.4 }}</label>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                                <h5>Tokenizing</h5><br>
+                                <label>{{ row.5 }}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+    {% else %}
+    <tr>
+        <td colspan="2">No Data</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

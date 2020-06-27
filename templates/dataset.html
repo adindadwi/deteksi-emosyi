@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block title %} Dataset {% endblock %}
+
+{% block body %}
+
+<table id="dataTable" class="table table-striped">
+    <thead>
+    <tr>
+        <td>Label</td>
+        <td>Tweet</td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in dataset %}
+    <tr>
+        <td>{{ row.1 }}</td>
+        <td>{{ row.2 }}</td>
+        <!--<td>
+            <a href="#!" class="btn btn-info" data-toggle="modal" data-target="#detail{{ row.0 }}"><i class="fa fa-info-circle"></i> detail </a>
+        </td>-->
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="2">No Data</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
