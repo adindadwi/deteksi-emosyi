@@ -8,25 +8,25 @@ import re
 import string
 import nltk
 
-import os
-os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
-os.environ["RUNFILES_DIR"] = "C:/Users/Adinda Dwi/PycharmProjects/env/plaidml/"
+# import os
+# os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+# os.environ["RUNFILES_DIR"] = "C:/Users/Adinda Dwi/PycharmProjects/env/plaidml/"
 
 
-import keras
-from keras import optimizers
-from keras.preprocessing.text import one_hot
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import Sequential
-from keras.layers.core import Activation, Dropout, Dense
-from keras.layers import Flatten, LSTM
-from keras.models import Model
-from keras.layers.embeddings import Embedding
-from keras.preprocessing.text import Tokenizer
-from keras.utils import to_categorical
-from keras.layers import Input
-from keras.layers.merge import Concatenate
-from keras import backend as K
+# import keras
+# from keras import optimizers
+# from keras.preprocessing.text import one_hot
+# from keras.preprocessing.sequence import pad_sequences
+# from keras.models import Sequential
+# from keras.layers.core import Activation, Dropout, Dense
+# from keras.layers import Flatten, LSTM
+# from keras.models import Model
+# from keras.layers.embeddings import Embedding
+# from keras.preprocessing.text import Tokenizer
+# from keras.utils import to_categorical
+# from keras.layers import Input
+# from keras.layers.merge import Concatenate
+# from keras import backend as K
 
 
 # mendeklarasikan project Flask ke dalam variabel app
