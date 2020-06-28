@@ -32,7 +32,7 @@ import nltk
 # mendeklarasikan project Flask ke dalam variabel app
 app = Flask(__name__)
 
-max_size = 5000  # 1000 kata teratas
+max_size = 5000  # 5000 kata teratas
 maxlen = 100
 embedding_dim = 100
 embedding_dim2 = 50
@@ -128,7 +128,6 @@ def preprocessing():
             if (line[0], line[2], token) not in prepro:
                 prepro.append(
                     {"id": line[0], "tweet": line[2], "token": token})
-        # dt['tweet'] = dt['tweet'].map(lambda x: clean_text(x))
 
         with open('preprocessing.json', 'w') as outfile:
             json.dump(prepro, outfile)  # dump json menjadi file
@@ -143,20 +142,7 @@ def preprocessing():
 
 @app.route('/vektorisasi')
 def vektorisasi():
-    dataTrain = csv.reader(open('dataset_demo.csv'))
-    tokenizer = Tokenizer(num_words=max_size)  # load data sebagai list of integer
-    tokenizer.fit_on_texts(dataTrain['tweet'])
-    trainSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
-    testSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
-    word_index = tokenizer.word_index
-    print('Found %s unique tokens.' % len(word_index))
-
-    data = pad_sequences(trainSequences, maxlen)  # kata yang kurang dr 100 diberi padding 0
-    labels = to_categorical(np.array(labels))
-    print('Shape of data tensor:', data.shape)
-    print('Shape of label tensor:', labels.shape)
     return render_template('vektorisasi.html')
-
 
 @app.route('/model')
 def model():
