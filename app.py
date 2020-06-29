@@ -13,6 +13,9 @@ import re
 import string
 import nltk
 
+# import os
+# os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+# os.environ["RUNFILES_DIR"] = "C:/Users/Adinda Dwi/PycharmProjects/env/plaidml/"
 
 from keras.utils import to_categorical
 from keras_preprocessing.sequence import pad_sequences
