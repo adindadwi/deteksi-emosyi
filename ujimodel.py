@@ -29,7 +29,7 @@ dataTest = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
 dataTest.columns = ['label', 'tweet']
 
 labels = dataTest["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
-label2emotion = {0: "anger", 1: "fear", 2: "happy", 3: "love", 4: "sadness"}
+label_seq = ["anger","fear", "happy","love","sadness"]
 
 max_size = 5000  # 1000 kata teratas
 maxlen = 100
@@ -51,13 +51,33 @@ word_index = tokenizer.word_index
 print('Found %s unique tokens.' % len(word_index))
 
 model = load_model('model_SS_BED.h5')
-testData = pad_sequences(testSequences, maxlen=maxlen)
-labels = to_categorical(np.array(labels))
-print(labels)
+data = pad_sequences(testSequences, maxlen=maxlen)
 
-for line in testData:
-    predictions = model.predict_classes(testData)
-    print(predictions, labels)
+for k in range(num_folds):
+    print('-' * 10)
+    print("Fold %d/%d" % (k + 1, num_folds))
+    validationSize = int(len(data) / num_folds)
+    index1 = validationSize * k
+    index2 = validationSize * (k + 1)
 
-# print(labels[np.argmax(predictions[0])])
+    xVal = data[index1:index2]
+    # xVal2 = data2[index1:index2]
+    yVal = labels[index1:index2]
+
+    i = 10
+    # get actual
+    get_actual = yVal[i]  # get actual
+    max_actual = np.amax(get_actual)
+    index_actual = np.where(max_actual == max_actual)
+    get_actual_label = label_seq[index_actual[0][0]]
+    print("Actual Class :" + get_actual_label)
+
+    # get predict
+    get_predict = model.predictions[i]  # get predict
+    max_predict = np.amax(get_predict)
+    print(get_predict)
+    index_predict = np.where(get_predict == max_predict)
+    get_predict_label = label_seq[index_predict[0][0]]
+    print("Predict Class :" + get_predict_label)
+
 

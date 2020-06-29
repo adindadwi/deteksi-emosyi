@@ -26,7 +26,6 @@ import numpy as np
 import io
 import re
 import string
-import nltk
 from numpy import array
 
 dataTrain = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
@@ -41,6 +40,7 @@ dataTrain = dataTrain[dataTrain.tweet.apply(lambda x: x !=" ")]
 
 # print(data["tweet"][168])
 labels = dataTrain["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
+label_seq = ["anger", "fear", "happy", "love", "sadness"]
 label2emotion = {0: "anger", 1: "fear", 2: "happy", 3: "love", 4: "sadness"}
 
 max_size = 5000  # 5000 kata teratas
@@ -61,7 +61,7 @@ dropout = 0.3
 tokenizer = Tokenizer(num_words=max_size)  # load data sebagai list of integer
 tokenizer.fit_on_texts(dataTrain['tweet'])
 trainSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
-testSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
+# testSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
 word_index = tokenizer.word_index
 print('Found %s unique tokens.' % len(word_index))
 
@@ -71,6 +71,7 @@ data = pad_sequences(trainSequences, maxlen)  # kata yang kurang dr 100 diberi p
 labels = to_categorical(np.array(labels))
 print('Shape of data tensor:', data.shape)
 print('Shape of label tensor:', labels.shape)
+# print(labels)
 # print(data)
 
 
@@ -84,6 +85,8 @@ for line in f:
     embeddings_index[word] = coefs
 f.close()
 print('Loaded %s word vectors.' % len(embeddings_index))
+
+
 # create a weight matrix for words in training docs
 embedding_matrix = np.zeros((max_size, embedding_dim))
 for word, i in word_index.items():
@@ -147,6 +150,7 @@ def buildmodel(embedding_matrix):
     x = Dropout(rate=dropout)(x)
     output = Dense(units=num_classes, activation='softmax')(x)
     model = Model(inputs=[model1_input, model2_input], outputs=output)"""
+
     model.add(Dense(units=num_classes, activation='softmax'))
     sgd = optimizers.sgd(lr=learning_rate)
     model.compile(loss='categorical_crossentropy',
@@ -162,9 +166,9 @@ def getMetrics(predictions, ground):
     falsePositives = np.sum(np.clip(discretePredictions - ground, 0, 1), axis=0)
     falseNegatives = np.sum(np.clip(ground - discretePredictions, 0, 1), axis=0)
 
-    print("True Positives per class : ", truePositives)
+    """print("True Positives per class : ", truePositives)
     print("False Positives per class : ", falsePositives)
-    print("False Negatives per class : ", falseNegatives)
+    print("False Negatives per class : ", falseNegatives)"""
 
     for c in range(0, num_classes):
         precision = truePositives[c] / (truePositives[c] + falsePositives[c])
@@ -186,17 +190,6 @@ def getMetrics(predictions, ground):
 
     return accuracy, precision, recall, f1
 
-
-"""metrics = {
-    "f1_e": (lambda y_test, y_pred:
-             f1_score(y_test, y_pred, average='micro', labels=[labels['anger'], labels['fear'], labels['happy'], labels['love'], labels['sadness']])),
-    "precision_e": (lambda y_test, y_pred:
-                    precision_score(y_test, y_pred, average='micro',
-                                    labels=[labels['anger'], labels['fear'], labels['happy'], labels['love'], labels['sadness']])),
-    "recall_e": (lambda y_test, y_pred:
-                 recall_score(y_test, y_pred, average='micro',
-                              labels=[labels['anger'], labels['fear'], labels['happy'], labels['love'], labels['sadness']]))
-}"""
 
 # Perform k-fold cross validation
 metrics = {"accuracy": [],
@@ -238,17 +231,7 @@ for k in range(num_folds):
     metrics["recall"].append(recall)
     metrics["f1"].append(f1)
     # print(classification_report(yVal, predictions))
-
-    """
-    Y = dataTrain[dataTrain.columns.drop(['tweet', 'index'])]
-    label_names = Y.columns
-    for (i, label) in enumerate(label_names):
-        print(f'For message category {label}:\n')
-        print(classification_report(predictions[:, i], yVal[label]))
-        
-    prediction_label = labels[np.argmax(predictions[1])]
-    print('Actual label:' + yVal.iloc[i])
-    print("Predicted label: " + prediction_label)"""
+    
 
 print("\n============= Metrics =================")
 print("Average Cross-Validation Accuracy : %.4f" % (sum(metrics["accuracy"]) / len(metrics["accuracy"])))
@@ -259,34 +242,31 @@ print("\n======================================")
 
 model = buildmodel(embedding_matrix)
 # model.fit(data, labels, epochs=NUM_EPOCHS, batch_size=batchs_size)
-model.save('model_demo.h5')
+# model.save('model_demo.h5')
 # model = load_model('EP%d_LR%de-5_LDim%d_BS%d.h5'%(NUM_EPOCHS, int(LEARNING_RATE*(10**5)), LSTM_DIM, BATCH_SIZE))
 
-print("Creating solution file...")
+"""print("Creating solution file...")
 testData = pad_sequences(testSequences, maxlen=maxlen)
 predictions = model.predict(testData)
 predictions = predictions.argmax(axis=1)
-print("")
-"""t = 0
-
-for text in data['tweet']:
-    i = 0
-    print("Prediksi untuk \"%s\": " % text)
-    for label in labels:
-        print("\t%s ==> %f" % (label, predictions[t][i]))
-        i = i + 1
-    t = t + 1"""
+print("")"""
 """predictions[0]
 print('Label Prediksi: %s ' % (labels[np.argmax(predictions[0])]))
 print('Label Asli: %s ' % (yVal[0]))"""
 # predictions = predictions.argmax(axis=1)
 
-with io.open("solution.csv", "a") as fout:
-    fout.write('\t'.join(["label", "tweet"]) + '\n')
-    with io.open("data_train_processed.csv") as fin:
-        fin.readline()
-        for lineNum, line in enumerate(fin):
-            fout.write('\t'.join(line.strip().split('\t')[:4]) + '\t')
-            fout.write(labels[predictions[lineNum]] + '\n')
-print("Completed. Model parameters: ")
-print("Learning rate : %.3f, LSTM Dim : %d, Dropout : %.3f, Batch_size : %d" % (learning_rate, lstm_dim, dropout, batchs_size))
+i = 10
+# get actual
+get_actual = yVal[i]  # get actual
+max_actual = np.amax(get_actual)
+index_actual = np.where(max_actual == max_actual)
+get_actual_label = label_seq[index_actual[0][0]]
+print("Actual Class :" + get_actual_label)
+
+# get predict
+get_predict = model.predictions[i]  # get predict
+max_predict = np.amax(get_predict)
+print(get_predict)
+index_predict = np.where(get_predict == max_predict)
+get_predict_label = label_seq[index_predict[0][0]]
+print("Predict Class :" + get_predict_label)
