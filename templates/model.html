@@ -1,7 +1,45 @@
 {% extends 'layout.html' %}
 
-{% block title %} SS-BED {% endblock %}
+{% block title %} LSTM-GloVe {% endblock %}
 
 {% block body %}
 
+<table id="dataTable" class="table table-striped">
+    <thead>
+    <tr>
+        <td>Label Asli</td>
+        <td>Label Prediksi</td>
+        <td>Prediksi</td>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr>
+        <td>anger</td>
+        <td>anger</td>
+        <td>[0.18490501 0.09845939 0.34828445 0.12482215 0.24352905]</td>
+    </tr>
+    <tr>
+        <td>anger</td>
+        <td>love</td>
+        <td>[0.06926195 0.09570088 0.08636386 0.5361558  0.21251744]</td>
+    </tr>
+    <tr>
+        <td>happy</td>
+        <td>sadness</td>
+        <td>[0.21837936 0.14541638 0.26720494 0.08560254 0.28339678]</td>
+    </tr>
+    <tr>
+        <td>anger</td>
+        <td>anger</td>
+        <td>[0.272665534 0.18255553 0.15738763 0.12348093 0.2639206]</td>
+    </tr>
+    <tr>
+        <td>anger</td>
+        <td>anger</td>
+        <td>[0.313977 0.09654962 0.32804486 0.06361853 0.19781013]</td>
+    </tr>
+
+    </tbody>
+</table>
 {% endblock %}
