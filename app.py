@@ -1,4 +1,9 @@
+import os
+os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+os.environ["RUNFILES_DIR"] = "C:/Users/Adinda Dwi/PycharmProjects/env/plaidml/"
+
 from flask import Flask, render_template, request, redirect, url_for, flash
+from sklearn.model_selection import StratifiedKFold
 from werkzeug.utils import secure_filename
 import json
 import pandas as pd
@@ -29,6 +34,14 @@ import nltk
 # from keras import backend as K
 
 
+from keras.utils import to_categorical
+from keras_preprocessing.sequence import pad_sequences
+from keras_preprocessing.text import Tokenizer
+
+import keras
+from keras.models import load_model
+
+
 # mendeklarasikan project Flask ke dalam variabel app
 app = Flask(__name__)
 
@@ -44,6 +57,12 @@ batchs_size = 5
 lstm_dim = 64
 hidden_layer_dim = 30
 dropout = 0.3
+
+model = load_model('model_SS_BED.h5')
+dataset = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
+dataset.columns = ['label', 'tweet']
+labels = dataset["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
+label_seq = ["anger", "fear", "happy", "love", "sadness"]
 
 
 @app.route('/')
@@ -61,15 +80,6 @@ def allowed_file(filename):
 
 @app.route('/dataset', methods=['GET', 'POST'])
 def dataset():
-    """if request.method == 'POST':
-        f = request.form['csvfile']
-        data = []
-        with open(f) as file:
-            csvfile = csv.reader(file)
-            for row in csvfile:
-                data.append(row)
-        data = pd.DataFrame(data)
-        return render_template('data.html', data=data.to_html(index=False))"""
     path = csv.reader(open('dataset_demo.csv'))
     prepro = []
     result = []
@@ -140,19 +150,41 @@ def preprocessing():
     return render_template('preprocessing.html', preprocessing=result)
 
 
-@app.route('/vektorisasi')
-def vektorisasi():
-    return render_template('vektorisasi.html')
-
 @app.route('/model')
 def model():
     return render_template('model.html')
 
 
+def getMetrics(predictions, ground):
+    label2emotion = {0: "anger", 1: "fear", 2: "happy", 3: "love", 4: "sadness"}
+
+    discretePredictions = to_categorical(predictions.argmax(axis=1))
+    truePositives = np.sum(discretePredictions * ground, axis=0)
+    falsePositives = np.sum(np.clip(discretePredictions - ground, 0, 1), axis=0)
+    falseNegatives = np.sum(np.clip(ground - discretePredictions, 0, 1), axis=0)
+
+    for c in range(0, num_classes):
+        precision = truePositives[c] / (truePositives[c] + falsePositives[c])
+        recall = truePositives[c] / (truePositives[c] + falseNegatives[c])
+        f1 = 2 * ((recall * precision) / (precision + recall))
+        print("Class %s : Precision : %.3f, Recall : %.3f, F1 : %.3f" % (label2emotion[c], precision, recall, f1))
+
+        predictions = predictions.argmax(axis=1)
+        ground = ground.argmax(axis=1)
+        accuracy = np.mean(predictions == ground)
+
+        return accuracy, precision, recall, f1
+
+
+metrics = {"accuracy": [],
+           "precision": [],
+           "recall": [],
+           "f1": []}
+
+
 @app.route('/uji')
 def uji():
-    # model = load_model('model_SS_BED.h5')
-    return render_template('uji.html')
+    return render_template('uji.html', )
 
 
 # untuk menjalankan web service aplikasi flask
