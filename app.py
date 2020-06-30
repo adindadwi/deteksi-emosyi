@@ -1,9 +1,4 @@
-import os
-os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
-os.environ["RUNFILES_DIR"] = "C:/Users/Adinda Dwi/PycharmProjects/env/plaidml/"
-
 from flask import Flask, render_template, request, redirect, url_for, flash
-from sklearn.model_selection import StratifiedKFold
 from werkzeug.utils import secure_filename
 import json
 import pandas as pd
@@ -17,12 +12,12 @@ import nltk
 # os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
 # os.environ["RUNFILES_DIR"] = "C:/Users/Adinda Dwi/PycharmProjects/env/plaidml/"
 
-from keras.utils import to_categorical
-from keras_preprocessing.sequence import pad_sequences
-from keras_preprocessing.text import Tokenizer
+# from keras.utils import to_categorical
+# from keras_preprocessing.sequence import pad_sequences
+# from keras_preprocessing.text import Tokenizer
 
-import keras
-from keras.models import load_model
+# import keras
+# from keras.models import load_model
 
 
 # mendeklarasikan project Flask ke dalam variabel app
