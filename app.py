@@ -36,7 +36,7 @@ lstm_dim = 64
 hidden_layer_dim = 30
 dropout = 0.3
 
-model = load_model('model_SS_BED.h5')
+# model = load_model('model_SS_BED.h5')
 dataset = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
 dataset.columns = ['label', 'tweet']
 labels = dataset["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
