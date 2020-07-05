@@ -23,12 +23,14 @@ from sklearn.metrics import classification_report, f1_score, precision_score, re
 
 import pandas as pd
 import numpy as np
+import joblib
+import pickle
 import io
 import re
 import string
 from numpy import array
 
-dataTrain = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
+dataTrain = pd.read_csv('twitter_emotion_dataset3.csv', sep=';', header=None)
 print(dataTrain.shape)
 dataTrain.head()
 dataTrain.columns = ['label', 'tweet']
@@ -218,13 +220,17 @@ for k in range(num_folds):
     model.summary()
     # [xTrain, xTrain2]
     # [xVal, xVal2]
+    print('Trainind model...')
     model.fit(xTrain,
               yTrain,
               validation_data=(xVal, yVal),
               batch_size=batchs_size,
               epochs=NUM_EPOCHS)
+    print('Saving model...')
+    model.save('model_%d.h5' % (num_folds))
 
     predictions = model.predict(xVal)
+
     accuracy, precision, recall, f1 = getMetrics(predictions, yVal)
     metrics["accuracy"].append(accuracy)
     metrics["precision"].append(precision)
@@ -240,7 +246,12 @@ print("Average Cross-Validation Recall : %.4f" % (sum(metrics["recall"]) / len(m
 print("Average Cross-Validation F1 : %.4f" % (sum(metrics["f1"]) / len(metrics["f1"])))
 print("\n======================================")
 
-model = buildmodel(embedding_matrix)
+with open('try.pkl', 'wb') as model_file:
+    joblib.dump(model, "classifier.pkl")
+json_model = model.to_json()
+with open('lstm_model.json', 'w') as json_file:
+    json_file.write(json_model)
+# model = buildmodel(embedding_matrix)
 # model.fit(data, labels, epochs=NUM_EPOCHS, batch_size=batchs_size)
 # model.save('model_demo.h5')
 # model = load_model('EP%d_LR%de-5_LDim%d_BS%d.h5'%(NUM_EPOCHS, int(LEARNING_RATE*(10**5)), LSTM_DIM, BATCH_SIZE))
@@ -264,7 +275,7 @@ get_actual_label = label_seq[index_actual[0][0]]
 print("Actual Class :" + get_actual_label)
 
 # get predict
-get_predict = model.predictions[i]  # get predict
+get_predict = model.predict[i]  # get predict
 max_predict = np.amax(get_predict)
 print(get_predict)
 index_predict = np.where(get_predict == max_predict)

@@ -3,6 +3,32 @@
 {% block title %} Preprocessing {% endblock %}
 
 {% block body %}
+<div class="jumbotron">
+    <div class="container">
+        <p class="text-center">Analyzing message data for disaster response</p>
+        <hr />
+
+        <div class="row">
+            <div class="col-lg-12 form-group-lg">
+                <form action="/go" method="get">
+                    <input type="text" class="form-control form-control-lg" name="query" placeholder="Masukkan tweet..">
+                    <div class="col-lg-offset-5">
+                        <button type="submit" class="btn btn-lg btn-success">OK</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% block message %}
+        {% endblock %}
+    </div>
+</div>
+
+{% block message %}
+    <hr />
+    <h4 class="text-center">TWEET</h4>
+    <p class="text-center"><i>{{query}}</i></p>
+{% endblock %}
 
 <table id="dataTable" class="table table-striped">
     <thead>

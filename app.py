@@ -36,11 +36,11 @@ lstm_dim = 64
 hidden_layer_dim = 30
 dropout = 0.3
 
-model = load_model('model_SS_BED.h5')
-dataset = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
-dataset.columns = ['label', 'tweet']
-labels = dataset["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
-label_seq = ["anger", "fear", "happy", "love", "sadness"]
+# model = load_model('model_SS_BED.h5')
+# dataset = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
+# dataset.columns = ['label', 'tweet']
+# labels = dataset["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
+# label_seq = ["anger", "fear", "happy", "love", "sadness"]
 
 
 @app.route('/')
@@ -133,7 +133,7 @@ def model():
     return render_template('model.html')
 
 
-def getMetrics(predictions, ground):
+"""def getMetrics(predictions, ground):
     label2emotion = {0: "anger", 1: "fear", 2: "happy", 3: "love", 4: "sadness"}
 
     discretePredictions = to_categorical(predictions.argmax(axis=1))
@@ -157,7 +157,7 @@ def getMetrics(predictions, ground):
 metrics = {"accuracy": [],
            "precision": [],
            "recall": [],
-           "f1": []}
+           "f1": []}"""
 
 
 @app.route('/uji')

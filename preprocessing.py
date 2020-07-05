@@ -5,7 +5,7 @@ import string
 import nltk
 from numpy import array
 
-data = pd.read_csv('dataset_demo.csv', sep=';', header=None)
+data = pd.read_csv('tesuji.csv', sep=';', header=None)
 print(data.shape)
 data.head()
 data.columns = ['label', 'tweet']
