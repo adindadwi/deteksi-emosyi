@@ -37,10 +37,17 @@ hidden_layer_dim = 30
 dropout = 0.3
 
 # model = load_model('model_SS_BED.h5')
+<<<<<<< HEAD
 # dataset = pd.read_csv('data_train_processed_demo.csv', sep=';', header=None)
 # dataset.columns = ['label', 'tweet']
 # labels = dataset["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
 # label_seq = ["anger", "fear", "happy", "love", "sadness"]
+=======
+dataset = pd.read_csv('data_train_processed.csv', sep=';', header=None)
+dataset.columns = ['label', 'tweet']
+labels = dataset["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
+label_seq = ["anger", "fear", "happy", "love", "sadness"]
+>>>>>>> b5cbfab4b3ee1a5dc3e07c95e930cb070f36a7ba
 
 
 @app.route('/')
