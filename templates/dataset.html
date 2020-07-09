@@ -4,22 +4,74 @@
 
 {% block body %}
 
+    <h1>Masukkan Tweet Anda</h1>
+    <form action="{{ url_for('insertData') }}" method = "POST">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <label>Isi Tweet</label>
+            </div>
+            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                <input class="form-control" type="text" name="tweet" id="tweet" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+        </div>
+    </form>
+
 <table id="dataTable" class="table table-striped">
     <thead>
     <tr>
-        <td>Label</td>
+        <td>No</td>
         <td>Tweet</td>
+        <td>Action</td>
     </tr>
     </thead>
     <tbody>
     {% for row in dataset %}
     <tr>
+        <td>{{ row.0 }}</td>
         <td>{{ row.1 }}</td>
-        <td>{{ row.2 }}</td>
         <!--<td>
             <a href="#!" class="btn btn-info" data-toggle="modal" data-target="#detail{{ row.0 }}"><i class="fa fa-info-circle"></i> detail </a>
         </td>-->
+        <td>
+            <a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#updateData{{ row.0 }}"><i class="fa fa-edit"></i></a>
+            <a href="/deleteData/{{ row.0 }}" class="btn btn-danger btn-xs" onclick="return confirm('Data ini akan dihapus. Apakah anda yakin?')"><i class="fa fa-trash"></i></a>
+        </td>
     </tr>
+
+    <div class="modal fade" id="updateData{{ row.0 }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ url_for('updateData') }}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Update Tweet</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label>Isi Tweet</label>
+                            </div>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <input class="form-control" type="text" name="uptweet" id="uptweet" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     {% else %}
     <tr>
         <td colspan="2">No Data</td>

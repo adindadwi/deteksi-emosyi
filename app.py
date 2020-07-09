@@ -7,9 +7,16 @@ import csv
 import re
 import string
 import nltk
-#import mysql.connector
+# from flaskext.mysql import MySQL
+import mysql.connector
 
-#mydb = mysql.connector.connect(host="localhost", user="root", passwd="")
+mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
+"""mysql = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)"""
 
 # import os
 # os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
@@ -42,7 +49,7 @@ def allowed_file(filename):
 
 @app.route('/dataset', methods=['GET', 'POST'])
 def dataset():
-    path = csv.reader(open('dataset_demo.csv'))
+    """path = csv.reader(open('dataset_demo.csv'))
     prepro = []
     result = []
     isi = []
@@ -51,8 +58,49 @@ def dataset():
         t = str(row).strip('[]').strip("'")
         b = t.rsplit(";")
         isi.append((i, b[0], b[1]))
-        i += 1
-    return render_template('dataset.html', dataset=isi)
+        i += 1"""
+    # conn = mydb.connect()
+    cursor = mydb.cursor()
+    sql = "SELECT * FROM web"
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    cursor.close()
+    return render_template('dataset.html', dataset=result)
+
+
+@app.route('/insertData', methods=['POST'])
+def insertData():
+    # conn = mydb.connect()
+    cursor = mydb.cursor()
+    tweet = request.form['tweet']
+    # sql = "INSERT INTO web (isi_tw) VALUES (%s)"
+    # t = tweet
+    cursor.execute("INSERT INTO web (isi_tw) VALUES (%s)", (tweet, ))
+    mydb.commit()
+    return redirect(url_for('dataset'))
+
+
+@app.route('/updateData', methods=['POST'])
+def updateData():
+    # conn = mydb.connect()
+    cursor = mydb.cursor()
+    id = request.form['id']
+    tweet = request.form['uptweet']
+    # sql = "UPDATE web SET isi_tw=%s WHERE id=%s"
+    # t = (tweet, id)
+    cursor.execute("UPDATE web SET isi_tw=%s WHERE id=%s", (tweet, id, ))
+    mydb.commit()
+    return redirect(url_for('dataset'))
+
+
+@app.route('/deleteData/<string:id>', methods=['GET'])
+def deleteData(id):
+    # conn = mydb.connect()
+    cursor = mydb.cursor()
+    # t = (id)
+    cursor.execute("DELETE FROM web WHERE id=%s", (id, ))
+    mydb.commit()
+    return redirect(url_for('dataset'))
 
 
 @app.route('/preprocessing', methods=['GET', 'POST'])
