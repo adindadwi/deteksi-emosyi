@@ -1,0 +1,213 @@
+{% extends 'layout.html' %}
+{% set active_page = "news" %}
+{% block title %} Home {% endblock %}
+
+{% block body %}
+<div class="main-content">
+            <!-- page title area start -->
+            <div class="page-title-area">
+                <div class="row align-items-center">
+                    <div class="col-sm-6">
+                        <div class="breadcrumbs-area clearfix">
+                            <h4 class="page-title pull-left">News</h4>
+                            <ul class="breadcrumbs pull-left">
+                                <li><a href="{{ url_for('index') }}">Home</a></li>
+                                <li><span>News</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="float-right">
+                                <button class="btn btn-success btn-xs mb-3 mt-3 mr-1 ml-1 float-right" type="submit" data-toggle="modal" data-target="#importNews"><i class="fa fa-download"></i></button>
+                                <button class="btn btn-success btn-xs mb-3 mt-3 float-right" type="submit" data-toggle="modal" data-target="#createNews"><i class="fa fa-plus-square"></i> Add News</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- page title area end -->
+            <br>
+            <div class="main-content-inner">
+                <div class="row">
+                    <!-- seo fact area start -->
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="data-tables datatable-primary">
+                                        <table id="dataTable" class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <td>No</td>
+                                                    <td>Title</td>
+                                                    <td>Source</td>
+                                                    <td>Action</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for row in news %}
+                                                    <tr>
+                                                        <td>{{ row.0 }}</td>
+                                                        <td>{{ row.1 }}</td>
+                                                        <td>{{ row.3 }}</td>
+                                                        <td>
+                                                            <a href="#!" class="btn btn-info btn-xs" data-toggle="modal" data-target="#detailNews{{ row.0 }}"><i class="fa fa-info-circle"></i></a>
+                                                            <a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#updateNews{{ row.0 }}"><i class="fa fa-edit"></i></a>
+                                                            <a href="/deleteNews/{{ row.0 }}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure delete this item?')"><i class="fa fa-trash"></i></a>
+                                                        </td>
+                                                    </tr>
+<!--                                                Start Modal Update-->
+                                                    <div class="modal fade" id="updateNews{{ row.0 }}">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <form action="{{ url_for('updateNews') }}" method="POST">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Update News</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+                                                                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                            <label>Title News</label>
+                                                                        </div>
+                                                                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                                                            <input class="form-control" type="text" id="id_news" name="id_news" value="{{ row.0 }}" hidden>
+                                                                            <input class="form-control" type="text" id="utitle" name="utitle" value="{{ row.1 }}">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+                                                                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                            <label>Description</label>
+                                                                        </div>
+                                                                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                                                            <textarea name="udesc" id="udesc" cols="40" rows="10">{{ row.2 }}</textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+                                                                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                            <label>Source</label>
+                                                                        </div>
+                                                                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                                                            <input class="form-control" type="text" id="usource" name="usource" value="{{ row.3 }}">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                                                </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+<!--                                                start modal detail-->
+                                                    <div class="modal fade bd-example-modal-lg" id="detailNews{{ row.0 }}">
+                                                        <div class="modal-dialog modal-lg">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title">Detail News title</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                                                                        <h5>Title</h5><br>
+                                                                        <label>{{ row.1 }}</label>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                                                                        <h5>Description</h5><br>
+                                                                        <label>{{ row.2 }}</label>
+                                                                    </div>
+                                                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 mt-2 mb-2">
+                                                                        <h5>Source</h5><br>
+                                                                        <label>{{ row.3 }}</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
+        <!--Modal-->
+        <div class="modal fade" id="createNews">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ url_for('createNews') }}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add News</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label>Title News</label>
+                            </div>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <input class="form-control" type="text" id="title" name="title" required>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label>Description</label>
+                            </div>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <textarea name="desc" id="desc" cols="40" rows="10" required></textarea>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 row mt-2 mb-2">
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                <label>Source</label>
+                            </div>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <input class="form-control" type="text" id="source" name="source" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="importNews">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <form action="{{ url_for('importNews') }}" method="POST" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import News</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <label>File</label>
+                            <input type="file" name="file" id="file" class="form-control dropify" data-height="100" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Import</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- main content area end -->
+        <!-- footer area start-->
+        <footer>
+            <div class="footer-area">
+                <p>© Copyright 2018. All right reserved. Template by <a href="https://colorlib.com/wp/">Colorlib</a>.</p>
+            </div>
+        </footer>
+{% endblock %}

@@ -256,15 +256,6 @@ with open('lstm_model.json', 'w') as json_file:
 # model.save('model_demo.h5')
 # model = load_model('EP%d_LR%de-5_LDim%d_BS%d.h5'%(NUM_EPOCHS, int(LEARNING_RATE*(10**5)), LSTM_DIM, BATCH_SIZE))
 
-"""print("Creating solution file...")
-testData = pad_sequences(testSequences, maxlen=maxlen)
-predictions = model.predict(testData)
-predictions = predictions.argmax(axis=1)
-print("")"""
-"""predictions[0]
-print('Label Prediksi: %s ' % (labels[np.argmax(predictions[0])]))
-print('Label Asli: %s ' % (yVal[0]))"""
-# predictions = predictions.argmax(axis=1)
 
 i = 10
 # get actual
