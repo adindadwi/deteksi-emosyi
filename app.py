@@ -109,7 +109,7 @@ def preprocessing():
         result = []
         for row in json_object:
             result.append((row["id"], row["tweet"], row["token"]))
-            return render_template('preprocessing.html', preprocessing=result)
+    return render_template('preprocessing.html', preprocessing=result)
 
 
 
