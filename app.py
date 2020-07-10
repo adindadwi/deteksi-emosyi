@@ -8,9 +8,9 @@ import re
 import string
 import nltk
 # from flaskext.mysql import MySQL
-import mysql.connector
+# import mysql.connector
 
-mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
+# mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 """mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
