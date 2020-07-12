@@ -12,8 +12,6 @@ from flaskext.mysql import MySQL
 # from db import mydb
 # import mysql.connector
 
-# mendeklarasikan project Flask ke dalam variabel app
-app = Flask(__name__)
 
 mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'b494071167088b'
@@ -42,6 +40,10 @@ mydb.init_app(app)
 
 # import keras
 # from keras.models import load_model
+
+
+# mendeklarasikan project Flask ke dalam variabel app
+app = Flask(__name__)
 
 
 @app.route('/')
