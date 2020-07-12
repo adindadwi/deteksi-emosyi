@@ -7,14 +7,20 @@ import csv
 import re
 import string
 import nltk
-# from flaskext.mysql import MySQL
-from app import app
-from db import mydb
+from flaskext.mysql import MySQL
+# from app import app
+# from db import mydb
 # import mysql.connector
 
 # mendeklarasikan project Flask ke dalam variabel app
-# app = Flask(__name__)
+app = Flask(__name__)
 
+mydb = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'b494071167088b'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'f589afc7'
+app.config['MYSQL_DATABASE_DB'] = 'heroku_35abaa3e25ea5b0'
+app.config['MYSQL_DATABASE_HOST'] = 'us-cdbr-east-02.cleardb.com'
+mydb.init_app(app)
 
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 
