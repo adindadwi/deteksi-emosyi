@@ -7,16 +7,23 @@ import csv
 import re
 import string
 import nltk
-# from flaskext.mysql import MySQL
+from flaskext.mysql import MySQL
+from db import mydb
 # import mysql.connector
 
+# mendeklarasikan project Flask ke dalam variabel app
+app = Flask(__name__)
+
+
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
-"""mysql = MySQL()
+
+mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)"""
+mydb.init_app(app)
+
 
 # import os
 # os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
@@ -28,10 +35,6 @@ mysql.init_app(app)"""
 
 # import keras
 # from keras.models import load_model
-
-
-# mendeklarasikan project Flask ke dalam variabel app
-app = Flask(__name__)
 
 
 @app.route('/')
@@ -59,71 +62,92 @@ def dataset():
         b = t.rsplit(";")
         isi.append((i, b[0], b[1]))
         i += 1"""
-    # conn = mydb.connect()
-    cursor = mydb.cursor()
+    conn = mydb.connect()
+    curs = conn.cursor()
+    sql = "SELECT * FROM web"
+    curs.execute(sql)
+    result = curs.fetchall()
+    conn.close()
+    """cursor = mydb.cursor()
     sql = "SELECT * FROM web"
     cursor.execute(sql)
     result = cursor.fetchall()
-    cursor.close()
+    cursor.close()"""
     return render_template('dataset.html', dataset=result)
 
 
 @app.route('/insertData', methods=['POST'])
 def insertData():
-    # conn = mydb.connect()
-    cursor = mydb.cursor()
+    tweet = request.form['tweet']
+    conn = mydb.connect()
+    curs = conn.cursor()
+    sql = "INSERT INTO web (isi_tw) VALUES (%s)"
+    t = tweet
+    curs.execute(sql, t)
+    conn.commit()
+    """cursor = mydb.cursor()
     tweet = request.form['tweet']
     # sql = "INSERT INTO web (isi_tw) VALUES (%s)"
     # t = tweet
     cursor.execute("INSERT INTO web (isi_tw) VALUES (%s)", (tweet, ))
-    mydb.commit()
+    mydb.commit()"""
     return redirect(url_for('dataset'))
 
 
 @app.route('/updateData', methods=['POST'])
 def updateData():
-    # conn = mydb.connect()
-    cursor = mydb.cursor()
+    conn = mydb.connect()
+    curs = conn.cursor()
     id = request.form['id']
     tweet = request.form['uptweet']
-    # sql = "UPDATE web SET isi_tw=%s WHERE id=%s"
-    # t = (tweet, id)
-    cursor.execute("UPDATE web SET isi_tw=%s WHERE id=%s", (tweet, id, ))
-    mydb.commit()
+    sql = "UPDATE web SET isi_tw=%s WHERE id=%s"
+    t = (tweet, id)
+    curs.execute(sql, t)
+    conn.commit()
+    """cursor.execute("UPDATE web SET isi_tw=%s WHERE id=%s", (tweet, id, ))
+    mydb.commit()"""
     return redirect(url_for('dataset'))
 
 
 @app.route('/deleteData/<string:id>', methods=['GET'])
 def deleteData(id):
-    # conn = mydb.connect()
-    cursor = mydb.cursor()
-    # t = (id)
-    cursor.execute("DELETE FROM web WHERE id=%s", (id, ))
-    mydb.commit()
+    conn = mydb.connect()
+    curs = conn.cursor()
+    sql = "DELETE FROM web WHERE id=%s"
+    t = (id)
+    curs.execute(sql, t)
+    conn.commit()
+    """cursor.execute("DELETE FROM web WHERE id=%s", (id, ))
+    mydb.commit()"""
     return redirect(url_for('dataset'))
 
 
-@app.route('/preprocessing', methods=['GET', 'POST'])
+@app.route('/preprocessing')
 def preprocessing():
     # dt = pd.read_csv('dataset_demo.csv', sep=';', header=None)
-    path = csv.reader(open('dataset_demo.csv'))
+    # path = csv.reader(open('dataset_demo.csv'))
+    conn = mydb.connect()
+    curs = conn.cursor()
+    sql = "SELECT * FROM web"
+    curs.execute(sql)
+    result = curs.fetchall()
     prepro = []
-    result = []
-    isi = []
+    final = []
+    """isi = []
     i = 0
     for row in path:
         t = str(row).strip('[]').strip("'")
         b = t.rsplit(";")
         isi.append((i, b[0], b[1]))
-        i += 1
+        i += 1"""
     with open('preprocessing.json', 'r') as openfile:
         # Reading from json file
         json_object = json.load(openfile)
     for row in json_object:
-        result.append((row["id"], row["tweet"], row["token"]))
+        final.append((row["id"], row["tweet"], row["token"]))
     # print(dt['tweet'])
-    if len(result) != len(isi):
-        for line in isi:
+    if len(result) != len(final):
+        for line in result:
             print(line[0])
             # data = []
             # line = line.append(data)
@@ -146,17 +170,16 @@ def preprocessing():
             # nltk tokenize
             token = nltk.tokenize.word_tokenize(stm)
             if (line[0], line[2], token) not in prepro:
-                prepro.append(
-                    {"id": line[0], "tweet": line[2], "token": token})
+                prepro.append({"id": line[0], "tweet": line[2], "token": token})
 
         with open('preprocessing.json', 'w') as outfile:
             json.dump(prepro, outfile)  # dump json menjadi file
         with open('preprocessing.json', 'r') as openfile:
             # Reading from json file
             json_object = json.load(openfile)
-        result = []
+        final = []
         for row in json_object:
-            result.append((row["id"], row["tweet"], row["token"]))
+            final.append((row["id"], row["tweet"], row["token"]))
     return render_template('preprocessing.html', preprocessing=result)
 
 
