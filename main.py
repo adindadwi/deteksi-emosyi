@@ -12,22 +12,25 @@ from flaskext.mysql import MySQL
 # from db import mydb
 # import mysql.connector
 
+# mendeklarasikan project Flask ke dalam variabel app
+app = Flask(__name__)
 
-mydb = MySQL()
+
+"""mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'b494071167088b'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'f589afc7'
 app.config['MYSQL_DATABASE_DB'] = 'heroku_35abaa3e25ea5b0'
 app.config['MYSQL_DATABASE_HOST'] = 'us-cdbr-east-02.cleardb.com'
-mydb.init_app(app)
+mydb.init_app(app)"""
 
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 
-"""mydb = MySQL()
+mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mydb.init_app(app)"""
+mydb.init_app(app)
 
 
 # import os
@@ -41,9 +44,6 @@ mydb.init_app(app)"""
 # import keras
 # from keras.models import load_model
 
-
-# mendeklarasikan project Flask ke dalam variabel app
-app = Flask(__name__)
 
 
 @app.route('/')
@@ -160,7 +160,7 @@ def preprocessing():
             print(line[0])
             # data = []
             # line = line.append(data)
-            tweet = str(line[2])
+            tweet = str(line[1])
             # mengubah text menjadi lowercase (casefolding)
             lowc = tweet.lower()
             # menghapus angka
@@ -178,8 +178,8 @@ def preprocessing():
             stm = stemmer.stem(stp)  # stemming process
             # nltk tokenize
             token = nltk.tokenize.word_tokenize(stm)
-            if (line[0], line[2], token) not in prepro:
-                prepro.append({"id": line[0], "tweet": line[2], "token": token})
+            if (line[0], line[1], token) not in prepro:
+                prepro.append({"id": line[0], "tweet": line[1], "token": token})
 
         with open('preprocessing.json', 'w') as outfile:
             json.dump(prepro, outfile)  # dump json menjadi file
@@ -189,6 +189,29 @@ def preprocessing():
         final = []
         for row in json_object:
             final.append((row["id"], row["tweet"], row["token"]))
+            sql = "SELECT * FROM preprocessing"
+            curs.execute(sql)
+            text = curs.fetchall()
+            if not text:
+                for row in final:
+                    id_pre = row[0]
+                    token = row[2]
+                    for row in token:
+                        sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
+                        t = (row, id_pre)
+                        curs.execute(sql, t)
+            else:
+                sql = "TRUNCATE preprocessing"
+                curs.execute(sql)
+                for row in final:
+                    id_pre = row[0]
+                    token = row[2]
+                    for row in token:
+                        sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
+                        t = (row, id_pre)
+                        curs.execute(sql, t)
+    conn.commit()
+    curs.close()
     return render_template('preprocessing.html', preprocessing=result)
 
 
