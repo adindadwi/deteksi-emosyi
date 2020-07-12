@@ -22,12 +22,12 @@ mydb.init_app(app)
 
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 
-# mydb = MySQL()
-# app.config['MYSQL_DATABASE_USER'] = 'root'
-# app.config['MYSQL_DATABASE_PASSWORD'] = ''
-# app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
-# app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-# mydb.init_app(app)
+"""mydb = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mydb.init_app(app)"""
 
 
 # import os
