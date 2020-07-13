@@ -14,21 +14,21 @@ from flaskext.mysql import MySQL
 app = Flask(__name__)
 
 
-"""mydb = MySQL()
+mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'b494071167088b'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'f589afc7'
 app.config['MYSQL_DATABASE_DB'] = 'heroku_35abaa3e25ea5b0'
 app.config['MYSQL_DATABASE_HOST'] = 'us-cdbr-east-02.cleardb.com'
-mydb.init_app(app)"""
+mydb.init_app(app)
 
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 
-mydb = MySQL()
+"""mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mydb.init_app(app)
+mydb.init_app(app)"""
 
 
 # import os
@@ -139,6 +139,7 @@ def preprocessing():
     curs.execute(sql)
     result = curs.fetchall()
     prepro = []
+    # print(prepro)
     final = []
     """isi = []
     i = 0
@@ -153,69 +154,84 @@ def preprocessing():
     for row in json_object:
         final.append((row["id"], row["tweet"], row["token"]))
     # print(dt['tweet'])
-    if len(result) != len(final):
-        for line in result:
-            print(line[0])
-            # data = []
-            # line = line.append(data)
-            tweet = str(line[1])
-            # mengubah text menjadi lowercase (casefolding)
-            lowc = tweet.lower()
-            # menghapus angka
-            numb = re.sub(r"\d+", "", lowc)
-            # Menghapus tanda baca
-            tanda = numb.translate(string.punctuation)
-            # stopword
-            stopwords = [line.rstrip() for line in open('stopword_list.txt')]
-            stop = [a for a in tanda if a not in stopwords]
-            stp = ''.join([str(elem) for elem in stop])
-            # import StemmerFactory class
-            from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-            factory = StemmerFactory()  # create Stemmer
-            stemmer = factory.create_stemmer()
-            stm = stemmer.stem(stp)  # stemming process
-            # nltk tokenize
-            token = nltk.tokenize.word_tokenize(stm)
-            if (line[0], line[1], token) not in prepro:
-                prepro.append({"id": line[0], "tweet": line[1], "token": token})
+    # if len(result) != len(final):
+    for line in result:
+        print(line[0])
+        # data = []
+        # line = line.append(data)
+        tweet = str(line[1])
+        # mengubah text menjadi lowercase (casefolding)
+        lowc = tweet.lower()
+        # menghapus angka
+        numb = re.sub(r"\d+", "", lowc)
+        # Menghapus tanda baca
+        tanda = numb.translate(string.punctuation)
+        # stopword
+        stopwords = [line.rstrip() for line in open('stopword_list.txt')]
+        stop = [a for a in tanda if a not in stopwords]
+        stp = ''.join([str(elem) for elem in stop])
+        # import StemmerFactory class
+        from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+        factory = StemmerFactory()  # create Stemmer
+        stemmer = factory.create_stemmer()
+        stm = stemmer.stem(stp)  # stemming process
+        # nltk tokenize
+        token = nltk.tokenize.word_tokenize(stm)
+        if (line[0], line[1], token) not in prepro:
+            prepro.append({"id": line[0], "tweet": line[1], "token": token})
 
-        with open('preprocessing.json', 'w') as outfile:
-            json.dump(prepro, outfile)  # dump json menjadi file
-        with open('preprocessing.json', 'r') as openfile:
-            # Reading from json file
-            json_object = json.load(openfile)
-        final = []
-        for row in json_object:
-            final.append((row["id"], row["tweet"], row["token"]))
-            sql = "SELECT * FROM preprocessing"
+    with open('preprocessing.json', 'w') as outfile:
+        json.dump(prepro, outfile)  # dump json menjadi file
+    with open('preprocessing.json', 'r') as openfile:
+        # Reading from json file
+        json_object = json.load(openfile)
+    final = []
+    for row in json_object:
+        final.append((row["id"], row["tweet"], row["token"]))
+        sql = "SELECT * FROM preprocessing"
+        curs.execute(sql)
+        text = curs.fetchall()
+        if not text:
+            for row in final:
+                id_tweet = row[0]
+                token = row[2]
+                for row in token:
+                    sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
+                    t = (row, id_tweet)
+                    curs.execute(sql, t)
+        else:
+            sql = "TRUNCATE preprocessing"
             curs.execute(sql)
-            text = curs.fetchall()
-            if not text:
-                for row in final:
-                    id_pre = row[0]
-                    token = row[2]
-                    for row in token:
-                        sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
-                        t = (row, id_pre)
-                        curs.execute(sql, t)
-            else:
-                sql = "TRUNCATE preprocessing"
-                curs.execute(sql)
-                for row in final:
-                    id_pre = row[0]
-                    token = row[2]
-                    for row in token:
-                        sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
-                        t = (row, id_pre)
-                        curs.execute(sql, t)
+            for row in final:
+                id_tweet = row[0]
+                token = row[2]
+                for row in token:
+                    sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
+                    t = (row, id_tweet)
+                    curs.execute(sql, t)
+    # print(prepro)
+    # print(final)
     conn.commit()
     curs.close()
-    return render_template('preprocessing.html', preprocessing=result)
+    return render_template('preprocessing.html', preprocessing=final)
 
 
 
 @app.route('/model')
 def model():
+    # input_text = "Hari ini saya sedang marah"
+    """inputSequence = tokenizer.texts_to_sequences([input_text])
+    input_data = pad_sequences(inputSequence, maxlen)
+    print(input_data)
+
+    # predict
+    model = model.load_model("model_5.h5")
+    get_predict = model.predict(input_data)
+    max_predict = np.amax(get_predict)
+    print(get_predict)
+    index_predict = np.where(get_predict == max_predict)
+    get_label = label_seq[index_predict[1][0]]
+    print("Predict Class :" + get_label)"""
     return render_template('model.html')
 
 
