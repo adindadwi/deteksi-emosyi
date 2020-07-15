@@ -154,61 +154,61 @@ def preprocessing():
     for row in json_object:
         final.append((row["id"], row["tweet"], row["token"]))
     # print(dt['tweet'])
-    # if len(result) != len(final):
-    for line in result:
-        print(line[0])
-        # data = []
-        # line = line.append(data)
-        tweet = str(line[1])
-        # mengubah text menjadi lowercase (casefolding)
-        lowc = tweet.lower()
-        # menghapus angka
-        numb = re.sub(r"\d+", "", lowc)
-        # Menghapus tanda baca
-        tanda = numb.translate(string.punctuation)
-        # stopword
-        stopwords = [line.rstrip() for line in open('stopword_list.txt')]
-        stop = [a for a in tanda if a not in stopwords]
-        stp = ''.join([str(elem) for elem in stop])
-        # import StemmerFactory class
-        from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-        factory = StemmerFactory()  # create Stemmer
-        stemmer = factory.create_stemmer()
-        stm = stemmer.stem(stp)  # stemming process
-        # nltk tokenize
-        token = nltk.tokenize.word_tokenize(stm)
-        if (line[0], line[1], token) not in prepro:
-            prepro.append({"id": line[0], "tweet": line[1], "token": token})
+    if len(result) != len(final):
+        for line in result:
+            print(line[0])
+            # data = []
+            # line = line.append(data)
+            tweet = str(line[1])
+            # mengubah text menjadi lowercase (casefolding)
+            lowc = tweet.lower()
+            # menghapus angka
+            numb = re.sub(r"\d+", "", lowc)
+            # Menghapus tanda baca
+            tanda = numb.translate(string.punctuation)
+            # stopword
+            stopwords = [line.rstrip() for line in open('stopword_list.txt')]
+            stop = [a for a in tanda if a not in stopwords]
+            stp = ''.join([str(elem) for elem in stop])
+            # import StemmerFactory class
+            from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+            factory = StemmerFactory()  # create Stemmer
+            stemmer = factory.create_stemmer()
+            stm = stemmer.stem(stp)  # stemming process
+            # nltk tokenize
+            token = nltk.tokenize.word_tokenize(stm)
+            if (line[0], line[1], token) not in prepro:
+                prepro.append({"id": line[0], "tweet": line[1], "token": token})
 
-    with open('preprocessing.json', 'w') as outfile:
-        json.dump(prepro, outfile)  # dump json menjadi file
-    with open('preprocessing.json', 'r') as openfile:
-        # Reading from json file
-        json_object = json.load(openfile)
-    final = []
-    for row in json_object:
-        final.append((row["id"], row["tweet"], row["token"]))
-        sql = "SELECT * FROM preprocessing"
-        curs.execute(sql)
-        text = curs.fetchall()
-        if not text:
-            for row in final:
-                id_tweet = row[0]
-                token = row[2]
-                for row in token:
-                    sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
-                    t = (row, id_tweet)
-                    curs.execute(sql, t)
-        else:
-            sql = "TRUNCATE preprocessing"
+        with open('preprocessing.json', 'w') as outfile:
+            json.dump(prepro, outfile)  # dump json menjadi file
+        with open('preprocessing.json', 'r') as openfile:
+            # Reading from json file
+            json_object = json.load(openfile)
+        final = []
+        for row in json_object:
+            final.append((row["id"], row["tweet"], row["token"]))
+            sql = "SELECT * FROM preprocessing"
             curs.execute(sql)
-            for row in final:
-                id_tweet = row[0]
-                token = row[2]
-                for row in token:
-                    sql = "INSERT INTO preprocessing (hasil_pre, id_pre) VALUES(%s, %s)"
-                    t = (row, id_tweet)
-                    curs.execute(sql, t)
+            text = curs.fetchall()
+            if not text:
+                for row in final:
+                    id_tweet = row[0]
+                    token = row[2]
+                    for row in token:
+                        sql = "INSERT INTO preprocessing (hasil_pre, id_tweet) VALUES(%s, %s)"
+                        t = (row, id_tweet)
+                        curs.execute(sql, t)
+            else:
+                sql = "TRUNCATE preprocessing"
+                curs.execute(sql)
+                for row in final:
+                    id_tweet = row[0]
+                    token = row[2]
+                    for row in token:
+                        sql = "INSERT INTO preprocessing (hasil_pre, id_tweet) VALUES(%s, %s)"
+                        t = (row, id_tweet)
+                        curs.execute(sql, t)
     # print(prepro)
     # print(final)
     conn.commit()
