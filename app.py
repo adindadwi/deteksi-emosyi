@@ -10,6 +10,15 @@ import nltk
 from flaskext.mysql import MySQL
 # import mysql.connector
 
+import os
+os.environ["KERAS_BACKEND"] = "plaidml.keras.backend"
+os.environ["RUNFILES_DIR"] = "C:/Users/Adinda Dwi/PycharmProjects/env/plaidml/"
+
+from keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.text import Tokenizer
+from keras.models import load_model
+
+
 # mendeklarasikan project Flask ke dalam variabel app
 app = Flask(__name__)
 
@@ -216,22 +225,37 @@ def preprocessing():
     return render_template('preprocessing.html', preprocessing=final)
 
 
-
 @app.route('/model')
 def model():
-    # input_text = "Hari ini saya sedang marah"
-    """inputSequence = tokenizer.texts_to_sequences([input_text])
-    input_data = pad_sequences(inputSequence, maxlen)
-    print(input_data)
+    label_seq = ["anger", "fear", "happy", "love", "sadness"]
+    maxlen = 100
+    max_size = 5000
 
-    # predict
-    model = model.load_model("model_5.h5")
-    get_predict = model.predict(input_data)
-    max_predict = np.amax(get_predict)
-    print(get_predict)
-    index_predict = np.where(get_predict == max_predict)
-    get_label = label_seq[index_predict[1][0]]
-    print("Predict Class :" + get_label)"""
+    file = open('preprocessing.json', )
+    data = json.load(file)
+
+    for i in data:
+        input_text = i['token']
+        print(input_text)
+        tokenizer = Tokenizer(num_words=max_size)
+        tokenizer.fit_on_texts([input_text])
+        inputSequence = tokenizer.texts_to_sequences([input_text])
+        input_data = pad_sequences(inputSequence, maxlen)
+        print(input_data)
+
+        # predict
+        model = load_model("model_5.h5")
+        get_predict = model.predict(input_data)
+        max_predict = np.amax(get_predict)
+        print(get_predict)
+        index_predict = np.where(get_predict == max_predict)
+        get_label = label_seq[index_predict[1][0]]
+        print("Predict Class :" + get_label)
+
+        label_out = []
+        label_out.append(get_label)
+
+
     return render_template('model.html')
 
 
