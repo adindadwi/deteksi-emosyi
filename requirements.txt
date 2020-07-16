@@ -25,11 +25,12 @@ paho-mqtt==1.4.0
 pandas==1.0.5
 pbr==5.4.5
 Pillow==7.0.0
+plaidbench==0.7.0
+plaidml_keras==0.7.0
 pocket==0.3.6
 protobuf==3.12.0
 pyfiglet==0.8.post1
 PySocks==1.7.1
-PyMySQL==0.9.3
 python-dateutil==2.8.1
 python-engineio==3.10.0
 python-socketio==4.3.1
