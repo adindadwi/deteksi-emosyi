@@ -52,7 +52,6 @@ mydb.init_app(app)"""
 # from keras.models import load_model
 
 
-
 @app.route('/')
 def index():
     return render_template('beranda.html')
@@ -197,7 +196,7 @@ def preprocessing():
         final = []
         for row in json_object:
             final.append((row["id"], row["tweet"], row["token"]))
-            sql = "SELECT * FROM preprocessing"
+            """sql = "SELECT * FROM preprocessing"
             curs.execute(sql)
             text = curs.fetchall()
             if not text:
@@ -217,7 +216,7 @@ def preprocessing():
                     for row in token:
                         sql = "INSERT INTO preprocessing (hasil_pre, id_tweet) VALUES(%s, %s)"
                         t = (row, id_tweet)
-                        curs.execute(sql, t)
+                        curs.execute(sql, t)"""
     # print(prepro)
     # print(final)
     conn.commit()
@@ -230,10 +229,17 @@ def model():
     label_seq = ["anger", "fear", "happy", "love", "sadness"]
     maxlen = 100
     max_size = 5000
+    # result = []
+    # label_prediksi = []
+
+    """with open('hasil.json', 'r') as openfile:
+        # Reading from json file
+        json_object = json.load(openfile)
+    for row in json_object:
+        result.append((row["id"], row["tweet"], row["get_label"]))"""
 
     file = open('preprocessing.json', )
     data = json.load(file)
-
     for i in data:
         input_text = i['token']
         print(input_text)
@@ -246,17 +252,25 @@ def model():
         # predict
         model = load_model("model_5.h5")
         get_predict = model.predict(input_data)
-        max_predict = np.amax(get_predict)
         print(get_predict)
+
+        max_predict = np.amax(get_predict) # nilai paling besar dari prediksi = prediksi label
         index_predict = np.where(get_predict == max_predict)
         get_label = label_seq[index_predict[1][0]]
-        print("Predict Class :" + get_label)
+        # print("Predict Class :" + get_label)
+        """if (i[0], i[1], get_label) not in label_prediksi:
+            label_prediksi.append({"id": i[0], "tweet": i[1], "get_label": get_label})"""
 
-        label_out = []
-        label_out.append(get_label)
+    """with open('hasil.json', 'w') as outfile:
+        json.dump(label_prediksi, outfile)  # dump json menjadi file
+    with open('hasil.json', 'r') as openfile:
+        # Reading from json file
+        json_object = json.load(openfile)
+    result = []
+    for row in json_object:
+        result.append((row["id"], row["tweet"], row["get_label"]))"""
 
-
-    return render_template('model.html')
+    return render_template('model.html', model=result)
 
 
 @app.route('/uji')
