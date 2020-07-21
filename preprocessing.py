@@ -11,9 +11,9 @@ data.head()
 data.columns = ['label', 'tweet']
 
 # menghilangkan row yg memiliki nilai null atau string kosong
-data = data.dropna()
+# data = data.dropna()
 # data = data[data.label.apply(lambda x: x !=" ")]
-data = data[data.tweet.apply(lambda x: x !=" ")]
+# data = data[data.tweet.apply(lambda x: x !=" ")]
 
 # print(data["tweet"][168])
 # labels = data["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
@@ -29,16 +29,16 @@ def clean_text(tweet):
     # tweet = tweet.translate(str.maketrans("", "", string.punctuation))
     tweet = tweet.translate(string.punctuation)
     # stopword
-    stopwords = [line.rstrip() for line in open('stopword_list.txt')]
+    stopwords = [line.rstrip() for line in open('stopword_list.txt')]  # gabung dr list horizon jadi list verti
     stop = [a for a in tweet if a not in stopwords]
-    tweet = ''.join([str(elem) for elem in stop])
+    tweet = ''.join([str(elem) for elem in stop])  # penggabungan
     # import StemmerFactory class
     from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
     factory = StemmerFactory()  # create Stemmer
     stemmer = factory.create_stemmer()
     tweet = stemmer.stem(tweet)  # stemming process
-    # nltk tokenize
-    tweet = nltk.tokenize.word_tokenize(tweet)
+    # tokenize
+    tweet = tweet.split()
     return tweet
 
 

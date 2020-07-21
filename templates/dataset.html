@@ -14,8 +14,7 @@
                 <input class="form-control" type="text" name="tweet" id="tweet" required>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+                <button type="submit" class="btn btn-primary" onclick="window.location.href='{{ url_for( 'dataset') }}';">Simpan</button>
             </div>
         </div>
     </form>
@@ -25,7 +24,7 @@
     <tr>
         <td>No</td>
         <td>Tweet</td>
-        <td>Action</td>
+
     </tr>
     </thead>
     <tbody>
@@ -36,10 +35,10 @@
         <!--<td>
             <a href="#!" class="btn btn-info" data-toggle="modal" data-target="#detail{{ row.0 }}"><i class="fa fa-info-circle"></i> detail </a>
         </td>-->
-        <td>
+        <!--<td>
             <a href="#!" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#updateData{{ row.0 }}"><i class="fa fa-edit"></i></a>
             <a href="/deleteData/{{ row.0 }}" class="btn btn-danger btn-xs" onclick="return confirm('Data ini akan dihapus. Apakah anda yakin?')"><i class="fa fa-trash"></i></a>
-        </td>
+        </td>-->
     </tr>
 
     <div class="modal fade" id="updateData{{ row.0 }}">

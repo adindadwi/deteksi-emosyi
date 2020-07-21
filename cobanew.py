@@ -14,8 +14,6 @@ from keras.models import Model
 from keras.layers.embeddings import Embedding
 from keras.preprocessing.text import Tokenizer
 from keras.utils import to_categorical
-from keras.layers import Input
-from keras.layers.merge import Concatenate
 from keras import backend as K
 
 from sklearn.metrics import classification_report, f1_score, precision_score, recall_score, confusion_matrix, \
@@ -31,16 +29,11 @@ import string
 from numpy import array
 
 dataTrain = pd.read_csv('twitter_emotion_dataset3.csv', sep=';', header=None)
-print(dataTrain.shape)
+# print(dataTrain.shape)
 dataTrain.head()
 dataTrain.columns = ['label', 'tweet']
-
-# menghilangkan row yg memiliki nilai null atau string kosong
-dataTrain = dataTrain.dropna()
-dataTrain = dataTrain[dataTrain.label.apply(lambda x: x !=" ")]
-dataTrain = dataTrain[dataTrain.tweet.apply(lambda x: x !=" ")]
-
 # print(data["tweet"][168])
+
 labels = dataTrain["label"].map({"anger": 0, "fear": 1, "happy": 2, "love": 3, "sadness": 4})
 label_seq = ["anger", "fear", "happy", "love", "sadness"]
 label2emotion = {0: "anger", 1: "fear", 2: "happy", 3: "love", 4: "sadness"}
@@ -61,7 +54,9 @@ dropout = 0.3
 
 #tokenizer
 tokenizer = Tokenizer(num_words=max_size)  # load data sebagai list of integer
+# membuat index kamus berdasarkan frekuensi kata
 tokenizer.fit_on_texts(dataTrain['tweet'])
+# transform tiap teks menjadi sequence of integers
 trainSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
 # testSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
 word_index = tokenizer.word_index
@@ -90,6 +85,7 @@ print('Loaded %s word vectors.' % len(embeddings_index))
 
 
 # create a weight matrix for words in training docs
+# np.zeros = membuat matrix 0
 embedding_matrix = np.zeros((max_size, embedding_dim))
 for word, i in word_index.items():
     if i > max_size - 1:
@@ -201,12 +197,13 @@ metrics = {"accuracy": [],
 
 print("Starting k-fold cross validation...")
 for k in range(num_folds):
-    print('-' * 10)
+    print('-' * 10) # garis putus-putus
     print("Fold %d/%d" % (k + 1, num_folds))
     validationSize = int(len(data) / num_folds)
     index1 = validationSize * k
     index2 = validationSize * (k + 1)
-
+    # np.vstack = membuat array jadi vertikal
+    # biasa digunakan pada array 3D
     xTrain = np.vstack((data[:index1], data[index2:]))
     # xTrain2 = np.vstack((data2[:index1], data2[index2:]))
     yTrain = np.vstack((labels[:index1], labels[index2:]))

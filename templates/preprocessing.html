@@ -15,6 +15,7 @@
                                         <table id="dataTable" class="table table-striped">
                                             <thead>
                                             <tr>
+                                                <td>No.</td>
                                                 <td>Sebelum Preprocessing</td>
                                                 <td>Setelah Preprocessing</td>
                                             </tr>
@@ -23,6 +24,7 @@
 
                                             {% for row in preprocessing %}
                                             <tr>
+                                                <td>{{ row.0 }}</td>
                                                 <td>{{ row.1 }}</td>
                                                 <td>{{ row.2 }}</td>
                                             </tr>

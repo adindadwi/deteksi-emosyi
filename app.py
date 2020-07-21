@@ -6,7 +6,6 @@ import numpy as np
 import csv
 import re
 import string
-import nltk
 from flaskext.mysql import MySQL
 # import mysql.connector
 
@@ -32,12 +31,12 @@ mydb.init_app(app)
 
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 
-"""mydb = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mydb.init_app(app)"""
+# mydb = MySQL()
+# app.config['MYSQL_DATABASE_USER'] = 'root'
+# app.config['MYSQL_DATABASE_PASSWORD'] = ''
+# app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
+# app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+# mydb.init_app(app)
 
 
 # import os
@@ -93,19 +92,32 @@ def dataset():
 
 @app.route('/insertData', methods=['POST'])
 def insertData():
-    tweet = request.form['tweet']
     conn = mydb.connect()
     curs = conn.cursor()
-    sql = "INSERT INTO web (isi_tw) VALUES (%s)"
-    t = tweet
+    tweet = request.form['tweet']
+    lowc = tweet.lower()
+    # menghapus angka
+    numb = re.sub(r"\d+", "", lowc)
+    # Menghapus tanda baca
+    tanda = numb.translate(string.punctuation)
+    # stopword
+    stopwords = [line.rstrip() for line in open('stopword_list.txt')]  # gabung dr list horizon jadi list verti
+    stop = [a for a in tanda if a not in stopwords]
+    stp = ''.join([str(elem) for elem in stop])  # penggabungan
+    # import StemmerFactory class
+    from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+    factory = StemmerFactory()  # create Stemmer
+    stemmer = factory.create_stemmer()
+    stm = stemmer.stem(stp)  # stemming process
+    # tokenize
+    token = stm.split()
+    hasil = str(token)
+
+    sql = "INSERT INTO web (isi_tw, hasil_pre) VALUES (%s, %s)"
+    t = tweet, hasil
     curs.execute(sql, t)
     conn.commit()
-    """cursor = mydb.cursor()
-    tweet = request.form['tweet']
-    # sql = "INSERT INTO web (isi_tw) VALUES (%s)"
-    # t = tweet
-    cursor.execute("INSERT INTO web (isi_tw) VALUES (%s)", (tweet, ))
-    mydb.commit()"""
+
     return redirect(url_for('dataset'))
 
 
@@ -146,82 +158,8 @@ def preprocessing():
     sql = "SELECT * FROM web"
     curs.execute(sql)
     result = curs.fetchall()
-    prepro = []
-    # print(prepro)
-    final = []
-    """isi = []
-    i = 0
-    for row in path:
-        t = str(row).strip('[]').strip("'")
-        b = t.rsplit(";")
-        isi.append((i, b[0], b[1]))
-        i += 1"""
-    with open('preprocessing.json', 'r') as openfile:
-        # Reading from json file
-        json_object = json.load(openfile)
-    for row in json_object:
-        final.append((row["id"], row["tweet"], row["token"]))
-    # print(dt['tweet'])
-    if len(result) != len(final):
-        for line in result:
-            print(line[0])
-            # data = []
-            # line = line.append(data)
-            tweet = str(line[1])
-            # mengubah text menjadi lowercase (casefolding)
-            lowc = tweet.lower()
-            # menghapus angka
-            numb = re.sub(r"\d+", "", lowc)
-            # Menghapus tanda baca
-            tanda = numb.translate(string.punctuation)
-            # stopword
-            stopwords = [line.rstrip() for line in open('stopword_list.txt')]
-            stop = [a for a in tanda if a not in stopwords]
-            stp = ''.join([str(elem) for elem in stop])
-            # import StemmerFactory class
-            from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
-            factory = StemmerFactory()  # create Stemmer
-            stemmer = factory.create_stemmer()
-            stm = stemmer.stem(stp)  # stemming process
-            # nltk tokenize
-            token = nltk.tokenize.word_tokenize(stm)
-            if (line[0], line[1], token) not in prepro:
-                prepro.append({"id": line[0], "tweet": line[1], "token": token})
-
-        with open('preprocessing.json', 'w') as outfile:
-            json.dump(prepro, outfile)  # dump json menjadi file
-        with open('preprocessing.json', 'r') as openfile:
-            # Reading from json file
-            json_object = json.load(openfile)
-        final = []
-        for row in json_object:
-            final.append((row["id"], row["tweet"], row["token"]))
-            """sql = "SELECT * FROM preprocessing"
-            curs.execute(sql)
-            text = curs.fetchall()
-            if not text:
-                for row in final:
-                    id_tweet = row[0]
-                    token = row[2]
-                    for row in token:
-                        sql = "INSERT INTO preprocessing (hasil_pre, id_tweet) VALUES(%s, %s)"
-                        t = (row, id_tweet)
-                        curs.execute(sql, t)
-            else:
-                sql = "TRUNCATE preprocessing"
-                curs.execute(sql)
-                for row in final:
-                    id_tweet = row[0]
-                    token = row[2]
-                    for row in token:
-                        sql = "INSERT INTO preprocessing (hasil_pre, id_tweet) VALUES(%s, %s)"
-                        t = (row, id_tweet)
-                        curs.execute(sql, t)"""
-    # print(prepro)
-    # print(final)
-    conn.commit()
-    curs.close()
-    return render_template('preprocessing.html', preprocessing=final)
+    conn.close()
+    return render_template('preprocessing.html', preprocessing=result)
 
 
 @app.route('/model')
@@ -232,45 +170,62 @@ def model():
     # result = []
     # label_prediksi = []
 
-    """with open('hasil.json', 'r') as openfile:
-        # Reading from json file
-        json_object = json.load(openfile)
-    for row in json_object:
-        result.append((row["id"], row["tweet"], row["get_label"]))"""
+    conn = mydb.connect()
+    curs = conn.cursor()
+    sql = "SELECT * FROM web ORDER BY id DESC LIMIT 1"
+    # sql = "SELECT * FROM web"
+    curs.execute(sql)
+    isi_data = curs.fetchall()
+    input = isi_data[0][2]
+    id_web = isi_data[0][0]
+    # print(id_web)
+    # conn.close()
 
-    file = open('preprocessing.json', )
-    data = json.load(file)
-    for i in data:
-        input_text = i['token']
-        print(input_text)
+    """for i in isi_data:
+        conn = mydb.connect()
+        curs = conn.cursor()
+        input = i[2]
+        # input = []"""
+    sql = "SELECT * FROM uji ORDER BY id_uji DESC LIMIT 1"
+    curs.execute(sql)
+    id_cek = isi_data[0][0]
+
+    if id_web != id_cek:
+        input_text = input
+        # print(input_text)
         tokenizer = Tokenizer(num_words=max_size)
         tokenizer.fit_on_texts([input_text])
         inputSequence = tokenizer.texts_to_sequences([input_text])
         input_data = pad_sequences(inputSequence, maxlen)
-        print(input_data)
+        # print(input_data)
 
         # predict
         model = load_model("model_5.h5")
         get_predict = model.predict(input_data)
         print(get_predict)
 
-        max_predict = np.amax(get_predict) # nilai paling besar dari prediksi = prediksi label
+        max_predict = np.amax(get_predict)  # nilai paling besar dari prediksi = prediksi label
         index_predict = np.where(get_predict == max_predict)
         get_label = label_seq[index_predict[1][0]]
         # print("Predict Class :" + get_label)
-        """if (i[0], i[1], get_label) not in label_prediksi:
-            label_prediksi.append({"id": i[0], "tweet": i[1], "get_label": get_label})"""
 
-    """with open('hasil.json', 'w') as outfile:
-        json.dump(label_prediksi, outfile)  # dump json menjadi file
-    with open('hasil.json', 'r') as openfile:
-        # Reading from json file
-        json_object = json.load(openfile)
-    result = []
-    for row in json_object:
-        result.append((row["id"], row["tweet"], row["get_label"]))"""
+        sql = "INSERT INTO uji (label_pred, id_web) VALUES (%s, %s)"
+        t = get_label, id_web
+        curs.execute(sql, t)
+        conn.commit()
 
-    return render_template('model.html', model=result)
+        sql = "SELECT id, isi_tw, label_pred FROM web JOIN uji WHERE id = id_web "
+        curs.execute(sql)
+        hasil = curs.fetchall()
+        conn.close()
+
+    else:
+        sql = "SELECT id, isi_tw, label_pred FROM web JOIN uji WHERE id = id_web "
+        curs.execute(sql)
+        hasil = curs.fetchall()
+        conn.close()
+
+    return render_template('model.html', model=hasil)
 
 
 @app.route('/uji')
