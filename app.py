@@ -31,12 +31,12 @@ mydb.init_app(app)
 
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 
-# mydb = MySQL()
-# app.config['MYSQL_DATABASE_USER'] = 'root'
-# app.config['MYSQL_DATABASE_PASSWORD'] = ''
-# app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
-# app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-# mydb.init_app(app)
+"""mydb = MySQL()
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = ''
+app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mydb.init_app(app)"""
 
 
 # import os
@@ -186,44 +186,39 @@ def model():
         curs = conn.cursor()
         input = i[2]
         # input = []"""
-    sql = "SELECT * FROM uji ORDER BY id_uji DESC LIMIT 1"
+    # sql = "SELECT * FROM uji ORDER BY id_uji DESC LIMIT 1"
+    # curs.execute(sql)
+    # id_cek = isi_data[0][0]
+
+    # if id_web != id_cek:
+    # else:
+    input_text = input
+    # print(input_text)
+    tokenizer = Tokenizer(num_words=max_size)
+    tokenizer.fit_on_texts([input_text])
+    inputSequence = tokenizer.texts_to_sequences([input_text])
+    input_data = pad_sequences(inputSequence, maxlen)
+    # print(input_data)
+
+    # predict
+    model = load_model("model_5.h5")
+    get_predict = model.predict(input_data)
+    print(get_predict)
+
+    max_predict = np.amax(get_predict)  # nilai paling besar dari prediksi = prediksi label
+    index_predict = np.where(get_predict == max_predict)
+    get_label = label_seq[index_predict[1][0]]
+    # print("Predict Class :" + get_label)
+
+    sql = "INSERT INTO uji (label_pred, id_web) VALUES (%s, %s)"
+    t = get_label, id_web
+    curs.execute(sql, t)
+    conn.commit()
+
+    sql = "SELECT id, isi_tw, label_pred FROM web JOIN uji WHERE id = id_web "
     curs.execute(sql)
-    id_cek = isi_data[0][0]
-
-    if id_web != id_cek:
-        input_text = input
-        # print(input_text)
-        tokenizer = Tokenizer(num_words=max_size)
-        tokenizer.fit_on_texts([input_text])
-        inputSequence = tokenizer.texts_to_sequences([input_text])
-        input_data = pad_sequences(inputSequence, maxlen)
-        # print(input_data)
-
-        # predict
-        model = load_model("model_5.h5")
-        get_predict = model.predict(input_data)
-        print(get_predict)
-
-        max_predict = np.amax(get_predict)  # nilai paling besar dari prediksi = prediksi label
-        index_predict = np.where(get_predict == max_predict)
-        get_label = label_seq[index_predict[1][0]]
-        # print("Predict Class :" + get_label)
-
-        sql = "INSERT INTO uji (label_pred, id_web) VALUES (%s, %s)"
-        t = get_label, id_web
-        curs.execute(sql, t)
-        conn.commit()
-
-        sql = "SELECT id, isi_tw, label_pred FROM web JOIN uji WHERE id = id_web "
-        curs.execute(sql)
-        hasil = curs.fetchall()
-        conn.close()
-
-    else:
-        sql = "SELECT id, isi_tw, label_pred FROM web JOIN uji WHERE id = id_web "
-        curs.execute(sql)
-        hasil = curs.fetchall()
-        conn.close()
+    hasil = curs.fetchall()
+    conn.close()
 
     return render_template('model.html', model=hasil)
 
