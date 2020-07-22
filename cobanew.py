@@ -58,13 +58,10 @@ tokenizer = Tokenizer(num_words=max_size)  # load data sebagai list of integer
 tokenizer.fit_on_texts(dataTrain['tweet'])
 # transform tiap teks menjadi sequence of integers
 trainSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
-# testSequences = tokenizer.texts_to_sequences(dataTrain['tweet'])
 word_index = tokenizer.word_index
 print('Found %s unique tokens.' % len(word_index))
 
 data = pad_sequences(trainSequences, maxlen)  # kata yang kurang dr 100 diberi padding 0
-# data2 = pad_sequences(trainSequences, maxlen) # mengubah lists of integers->2D integer tensor of shape (samples, maxlen)
-# print(data.shape)
 labels = to_categorical(np.array(labels))
 print('Shape of data tensor:', data.shape)
 print('Shape of label tensor:', labels.shape)
@@ -96,31 +93,8 @@ for word, i in word_index.items():
             embedding_matrix[i] = embedding_vector
 
 
-# embedding layer SSWE
-"""embeddings_index2 = {}
-fo = open('embedding-sswe/sswe-h.txt', 'r', encoding="utf8")
-for line in fo:
-    values = line.split()
-    word = values[0]
-    coefs = np.asarray(values[1:], dtype='float32')
-    embeddings_index2[word] = coefs
-f.close()
-print('Loaded %s word vectors.' % len(embeddings_index2))
-# create a weight matrix for words in training docs
-embedding_matrix2 = np.zeros((max_size, embedding_dim2))
-for word, i in word_index.items():
-    if i > max_size - 1:
-        break
-    else:
-        embedding_vector2 = embeddings_index2.get(word)
-        if embedding_vector2 is not None:
-            embedding_matrix2[i] = embedding_vector2"""
-
-
 # def buildmodel(embedding_matrix, embedding_matrix2):
 def buildmodel(embedding_matrix):
-    """model1_input = Input(shape=(maxlen,), dtype='int32', name='glove')
-    model2_input = Input(shape=(maxlen,), dtype='int32', name='sswe')"""
     # glove
     embedding_layer1 = Embedding(input_dim=max_size,
                                  output_dim=100,
@@ -128,26 +102,10 @@ def buildmodel(embedding_matrix):
                                  weights=[embedding_matrix],
                                  trainable=False)  # (model1_input)
 
-    """# sswe
-    embedding_layer2 = Embedding(input_dim=max_size,
-                                 output_dim=50,
-                                 input_length=maxlen,
-                                 weights=[embedding_matrix2],
-                                 trainable=False)(model2_input)"""
-
     model = Sequential()
     model.add(embedding_layer1)
-    # model_glove.add(Dropout(rate=dropout))
-    # model = LSTM(units=lstm_dim, dropout=0.3)(embedding_layer1)
+    
     model.add(LSTM(64, dropout=dropout))
-    # model_glove.add(Dropout(rate=dropout))
-    # model2 = LSTM(units=lstm_dim, dropout=0.3)(embedding_layer2)
-
-    """x = Concatenate(axis=-1)([model1, model2])
-
-    x = Dropout(rate=dropout)(x)
-    output = Dense(units=num_classes, activation='softmax')(x)
-    model = Model(inputs=[model1_input, model2_input], outputs=output)"""
 
     model.add(Dense(units=num_classes, activation='softmax'))
     sgd = optimizers.sgd(lr=learning_rate)
@@ -164,10 +122,6 @@ def getMetrics(predictions, ground):
     falsePositives = np.sum(np.clip(discretePredictions - ground, 0, 1), axis=0)
     falseNegatives = np.sum(np.clip(ground - discretePredictions, 0, 1), axis=0)
 
-    """print("True Positives per class : ", truePositives)
-    print("False Positives per class : ", falsePositives)
-    print("False Negatives per class : ", falseNegatives)"""
-
     for c in range(0, num_classes):
         precision = truePositives[c] / (truePositives[c] + falsePositives[c])
 
@@ -175,12 +129,6 @@ def getMetrics(predictions, ground):
 
         f1 = 2 * ((recall * precision) / (precision + recall))
         print("Class %s : Precision : %.3f, Recall : %.3f, F1 : %.3f" % (label2emotion[c], precision, recall, f1))
-
-    """ print("Get classification metrics")
-    classes = np.unique(predictions)
-    print("\nClassification Report \n", classification_report(yVal, predictions))
-    print("\nConfusion Matrix \n", confusion_matrix(yVal, predictions, labels=classes))
-    print("\nAccuracy Score \n", accuracy_score(yVal, predictions))"""
 
     predictions = predictions.argmax(axis=1)
     ground = ground.argmax(axis=1)
@@ -202,22 +150,19 @@ for k in range(num_folds):
     validationSize = int(len(data) / num_folds)
     index1 = validationSize * k
     index2 = validationSize * (k + 1)
-    # np.vstack = membuat array jadi vertikal
+    
     # biasa digunakan pada array 3D
-    xTrain = np.vstack((data[:index1], data[index2:]))
-    # xTrain2 = np.vstack((data2[:index1], data2[index2:]))
+    xTrain = np.vstack((data[:index1], data[index2:]))    
     yTrain = np.vstack((labels[:index1], labels[index2:]))
     xVal = data[index1:index2]
-    # xVal2 = data2[index1:index2]
     yVal = labels[index1:index2]
     print("Building model...")
 
     # create model
     model = buildmodel(embedding_matrix)
     model.summary()
-    # [xTrain, xTrain2]
-    # [xVal, xVal2]
-    print('Trainind model...')
+
+    print('Training model...')
     model.fit(xTrain,
               yTrain,
               validation_data=(xVal, yVal),
@@ -248,10 +193,6 @@ with open('try.pkl', 'wb') as model_file:
 json_model = model.to_json()
 with open('lstm_model.json', 'w') as json_file:
     json_file.write(json_model)
-# model = buildmodel(embedding_matrix)
-# model.fit(data, labels, epochs=NUM_EPOCHS, batch_size=batchs_size)
-# model.save('model_demo.h5')
-# model = load_model('EP%d_LR%de-5_LDim%d_BS%d.h5'%(NUM_EPOCHS, int(LEARNING_RATE*(10**5)), LSTM_DIM, BATCH_SIZE))
 
 
 i = 10
