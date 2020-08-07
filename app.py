@@ -22,21 +22,21 @@ from keras.models import load_model
 app = Flask(__name__)
 
 
-mydb = MySQL()
+"""mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'b494071167088b'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'f589afc7'
 app.config['MYSQL_DATABASE_DB'] = 'heroku_35abaa3e25ea5b0'
 app.config['MYSQL_DATABASE_HOST'] = 'us-cdbr-east-02.cleardb.com'
-mydb.init_app(app)
+mydb.init_app(app)"""
 
 # mydb = mysql.connector.connect(host="localhost", user="root", passwd="", database="klasifikasi")
 
-"""mydb = MySQL()
+mydb = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'klasifikasi'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mydb.init_app(app)"""
+mydb.init_app(app)
 
 
 # import os
