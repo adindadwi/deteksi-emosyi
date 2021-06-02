@@ -43,7 +43,7 @@ stevedore==1.32.0
 tqdm==4.46.1
 twitter==1.18.0
 typing==3.7.4.1
-urllib3==1.25.8
+urllib3==1.26.5
 virtualenv==16.7.7
 virtualenv-clone==0.5.4
 virtualenvwrapper==4.8.4
