@@ -27,7 +27,7 @@ Pillow==7.2.0
 plaidbench==0.7.0
 plaidml_keras==0.7.0
 pocket==0.3.6
-protobuf==3.12.0
+protobuf==3.18.3
 pyfiglet==0.8.post1
 PySocks==1.7.1
 python-dateutil==2.8.1
