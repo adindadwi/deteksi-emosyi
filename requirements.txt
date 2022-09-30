@@ -15,7 +15,7 @@ gunicorn==20.0.4
 idna==2.9
 itsdangerous==1.1.0
 Jinja2==2.10.3
-joblib==0.15.1
+joblib==1.2.0
 MarkupSafe==1.1.1
 mysql_connector==2.2.9
 monotonic==1.5
